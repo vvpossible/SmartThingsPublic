@@ -17,7 +17,7 @@ definition(
     name: "Yeelight",
     namespace: "vvpossible",
     author: "YEELIGHT",
-    description: "Allows you to connect your Yeelight smart lights (Singapore & US only) with SmartThings and control them from your Things area or Dashboard in the SmartThings Mobile app.",
+    description: "Allows you to connect your Yeelight smart lights (Singapore only currently) with SmartThings and control them from your Things area or Dashboard in the SmartThings Mobile app.",
     category: "SmartThings Labs",
     iconUrl: "https://s3.amazonaws.com/yeelight-images/yeelightlogo.png",
     iconX2Url: "https://s3.amazonaws.com/yeelight-images/yeelightlogo%402x.png",
@@ -340,7 +340,11 @@ def configLights() {
     	def d = getChildDevice(did)
         if(!d) {
             def newLight = lights.find { (it.did) == did }
-            d = addChildDevice("com.yeelight.www", newLight.type, did, null, [name: "${newLight?.name}", label: "${newLight?.name}", completedSetup: true])
+            try {
+            	d = addChildDevice("com.yeelight.www", newLight.type, did, null, [name: "${newLight?.name}", label: "${newLight?.name}", completedSetup: true])
+            } catch (e) {
+            	log.debug "unsupported device type"
+            }
         }
 		// Delete any that are no longer in settings
 		def delete = getChildDevices().findAll { (it.deviceNetworkId) != did }
@@ -467,4 +471,3 @@ def getProp(did, param) {
     else
         return [status: -1]
 }
-
